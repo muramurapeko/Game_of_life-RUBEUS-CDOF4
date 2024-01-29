@@ -1,61 +1,100 @@
-import os
+#!/usr/bin/env python3
 import time
+import os
+import random
+import sys
 
-def clear_screen():
-    os.system('clear' if os.name == 'posix' else 'cls')
+def clear_console():
+    os.system("cls")
 
-def initialize_grid(width, height):
+def create_initial_grid(rows, cols):
     grid = []
-    for _ in range(height):
-        row = [0] * width
-        grid.append(row)
+    for row in range(rows):
+        grid_rows = []
+        for col in range(cols):
+            # Generate a random number and based on that decide whether to add a live or dead cell to the grid
+            if random.randint(0, 7) == 0:
+                grid_rows += [1]
+            else:
+                grid_rows += [0]
+        grid += [grid_rows]
     return grid
 
-def print_grid(grid):
-    for row in grid:
-        print(''.join(['#' if cell else ' ' for cell in row]))
-
-def update_grid(grid):
-    new_grid = initialize_grid(len(grid[0]), len(grid))
-    for i in range(len(grid)):
-        for j in range(len(grid[i])):
-            live_neighbors = count_live_neighbors(grid, i, j)
-            if grid[i][j]:
-                new_grid[i][j] = 1 if 2 <= live_neighbors <= 3 else 0
+def print_grid(rows, cols, grid, generation):
+    clear_console()
+    output_str = ""
+    for row in range(rows):
+        for col in range(cols):
+            if grid[row][col] == 0:
+                output_str += ". "
             else:
-                new_grid[i][j] = 1 if live_neighbors == 3 else 0
-    return new_grid
+                output_str += "Y "
+        output_str += "\n\r"
+    print(output_str, end=" ")
 
-def count_live_neighbors(grid, row, col):
-    count = 0
-    for i in range(row - 1, row + 2):
-        for j in range(col - 1, col + 2):
-            if (0 <= i < len(grid)) and (0 <= j < len(grid[i])):
-                if (i != row or j != col) and grid[i][j]:
-                    count += 1
-    return count
 
-def main():
-    # Set the width and height of the grid
-    width = 40
-    height = 20
+def create_next_grid(rows, cols, grid, next_grid):
 
-    # Initialize the grid
-    grid = initialize_grid(width, height)
+    for row in range(rows):
+        for col in range(cols):
+            # Get the number of live cells adjacent to the cell at grid[row][col]
+            live_neighbors = get_live_neighbors(row, col, rows, cols, grid)
 
-    # Set some initial live cells
-    grid[5][5] = 1
-    grid[5][6] = 1
-    grid[6][5] = 1
-    grid[6][7] = 1
-    grid[7][6] = 1
+            # If the number of surrounding live cells is < 2 or > 3 then we make the cell at grid[row][col] a dead cell
+            if live_neighbors < 2 or live_neighbors > 3:
+                next_grid[row][col] = 0
+            # If the number of surrounding live cells is 3 and the cell at grid[row][col] was previously dead then make
+            # the cell into a live cell
+            elif live_neighbors == 3 and grid[row][col] == 0:
+                next_grid[row][col] = 1
+            # If the number of surrounding live cells is 3 and the cell at grid[row][col] is alive keep it alive
+            else:
+                next_grid[row][col] = grid[row][col]
 
-    # Run the game loop
-    while True:
-        clear_screen()
-        print_grid(grid)
-        grid = update_grid(grid)
-        time.sleep(0.5)
 
-if __name__ == '__main__':
-    main()
+def get_live_neighbors(row, col, rows, cols, grid):
+    life_sum = 0
+    for i in range(-1, 2):
+        for j in range(-1, 2):
+            # Make sure to count the center cell located at grid[row][col]
+            if not (i == 0 and j == 0):
+                # Using the modulo operator (%) the grid wraps around
+                life_sum += grid[((row + i) % rows)][((col + j) % cols)]
+    return life_sum
+
+
+def grid_changing(rows, cols, grid, next_grid):
+    for row in range(rows):
+        for col in range(cols):
+            if not grid[row][col] == next_grid[row][col]:
+                return True
+    return False
+
+def run_game():
+
+    # INITIALISATION
+    clear_console()
+    rows=25
+    cols=50
+    generations = 5000
+    current_generation = create_initial_grid(rows, cols)
+    next_generation = create_initial_grid(rows, cols)
+
+    # RUN
+    gen = 1
+    for gen in range(1, generations + 1):
+        if not grid_changing(rows, cols, current_generation, next_generation):
+            break
+        print_grid(rows, cols, current_generation, gen)
+        create_next_grid(rows, cols, current_generation, next_generation)
+        time.sleep(1 / 5.0)
+        current_generation, next_generation = next_generation, current_generation
+
+    print_grid(rows, cols, current_generation, gen)
+    return input("<Enter> to exit or r to run again: ")
+
+# START
+run = "r"
+while run == "r":
+    out = run_game()
+    run = out
