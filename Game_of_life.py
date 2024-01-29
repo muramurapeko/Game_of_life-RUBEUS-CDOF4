@@ -22,15 +22,15 @@ def create_initial_grid(rows, cols):
 
 def print_grid(rows, cols, grid, generation):
     clear_console()
-    output_str = ""
+    output_str = "   "
     for row in range(rows):
         for col in range(cols):
             if grid[row][col] == 0:
-                output_str += "  "
+                output_str += "     "
             else:
-                output_str += "Y "
-        output_str += "\n\r"
-    print(output_str, end=" ")
+                output_str += "Y  "
+        output_str += "   \n\r   "
+    print(output_str, end="     ")
 
 
 def create_next_grid(rows, cols, grid, next_grid):
@@ -63,7 +63,6 @@ def get_live_neighbors(row, col, rows, cols, grid):
     return life_sum
 
 def run_game():
-
     # INITIALISATION
     clear_console()
     rows=25
@@ -71,7 +70,7 @@ def run_game():
     generations = 5000
     current_generation = create_initial_grid(rows, cols)
     next_generation = create_initial_grid(rows, cols)
-
+    
     # RUN
     gen = 1
     for gen in range(1, generations + 1):
