@@ -26,7 +26,7 @@ def print_grid(rows, cols, grid, generation):
     for row in range(rows):
         for col in range(cols):
             if grid[row][col] == 0:
-                output_str += ". "
+                output_str += "  "
             else:
                 output_str += "Y "
         output_str += "\n\r"
@@ -62,14 +62,6 @@ def get_live_neighbors(row, col, rows, cols, grid):
                 life_sum += grid[((row + i) % rows)][((col + j) % cols)]
     return life_sum
 
-
-def grid_changing(rows, cols, grid, next_grid):
-    for row in range(rows):
-        for col in range(cols):
-            if not grid[row][col] == next_grid[row][col]:
-                return True
-    return False
-
 def run_game():
 
     # INITIALISATION
@@ -83,18 +75,14 @@ def run_game():
     # RUN
     gen = 1
     for gen in range(1, generations + 1):
-        if not grid_changing(rows, cols, current_generation, next_generation):
-            break
         print_grid(rows, cols, current_generation, gen)
         create_next_grid(rows, cols, current_generation, next_generation)
         time.sleep(1 / 5.0)
         current_generation, next_generation = next_generation, current_generation
 
     print_grid(rows, cols, current_generation, gen)
-    return input("<Enter> to exit or r to run again: ")
+    return input("Game finished !")
 
 # START
-run = "r"
-while run == "r":
-    out = run_game()
-    run = out
+run_game()
+   
