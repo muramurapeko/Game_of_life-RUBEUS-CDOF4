@@ -22,15 +22,15 @@ def create_initial_grid(rows, cols):
 
 def print_grid(rows, cols, grid, generation):
     clear_console()
-    output_str = "   "
+    output_str = ""
     for row in range(rows):
         for col in range(cols):
             if grid[row][col] == 0:
-                output_str += "     "
+                output_str += "  "
             else:
-                output_str += "Y  "
-        output_str += "   \n\r   "
-    print(output_str, end="     ")
+                output_str += "Y "
+        output_str += "\n\r"
+    print(output_str, end="")
 
 
 def create_next_grid(rows, cols, grid, next_grid):
