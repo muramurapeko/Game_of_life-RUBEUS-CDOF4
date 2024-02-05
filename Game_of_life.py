@@ -28,7 +28,7 @@ def print_grid(rows, cols, grid, generation):
             if grid[row][col] == 0:
                 output_str += "  "
             else:
-                output_str += "Y "
+                output_str += "■ "
         output_str += "\n\r"
     print(output_str, end="")
 
